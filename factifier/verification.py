@@ -9,6 +9,7 @@ from langchain_core.language_models import BaseLanguageModel
 
 __all__ = ["DnDScoreVerifier"]
 
+
 class DnDScoreVerifier:
     def __init__(self, llm: BaseLanguageModel):
         """
@@ -19,19 +20,23 @@ class DnDScoreVerifier:
         """
         self.llm = llm
         # Create prompt template
-        self.verification_prompt = ChatPromptTemplate.from_messages([
-            ("user",
-             "Reference: {reference}\n"
-             "Context: {decontext_claim}\n"
-             "Claim: {atomic_claim}\n"
-             "Is the claim supported by the reference? Answer yes or no.")
-        ])
+        self.verification_prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "user",
+                    "Reference: {reference}\n"
+                    "Context: {decontext_claim}\n"
+                    "Claim: {atomic_claim}\n"
+                    "Is the claim supported by the reference? Answer yes or no.",
+                )
+            ]
+        )
         # Create the LCEL chain
         self.chain = (
             {
                 "atomic_claim": RunnablePassthrough(),  # Receives 'atomic_claim' from chain input
-                "decontext_claim": RunnablePassthrough(),  # Receives 'decontext_claim' from chain input
-                "reference": RunnablePassthrough()  # Receives 'reference' from chain input
+                "decontext_claim": RunnablePassthrough(),  # Receives 'decontext_claim' from chain
+                "reference": RunnablePassthrough(),  # Receives 'reference' from chain input
             }
             | self.verification_prompt
             | self.llm
@@ -51,14 +56,18 @@ class DnDScoreVerifier:
             bool: True if the claim is supported, False otherwise.
         """
         # Invoke the chain with the provided inputs
-        result = self.chain.invoke({
-            "atomic_claim": atomic_claim,
-            "decontext_claim": decontext_claim,
-            "reference": reference
-        })
+        result = self.chain.invoke(
+            {
+                "atomic_claim": atomic_claim,
+                "decontext_claim": decontext_claim,
+                "reference": reference,
+            }
+        )
         return result.strip().lower() == "yes"
 
-    async def verify_async(self, atomic_claim: str, decontext_claim: str, reference: str) -> bool:
+    async def verify_async(
+        self, atomic_claim: str, decontext_claim: str, reference: str
+    ) -> bool:
         """
         Verify if the atomic claim is supported by the reference (asynchronous).
 
@@ -71,11 +80,13 @@ class DnDScoreVerifier:
             bool: True if the claim is supported, False otherwise.
         """
         # Invoke the chain asynchronously with the provided inputs
-        result = await self.chain.ainvoke({
-            "atomic_claim": atomic_claim,
-            "decontext_claim": decontext_claim,
-            "reference": reference
-        })
+        result = await self.chain.ainvoke(
+            {
+                "atomic_claim": atomic_claim,
+                "decontext_claim": decontext_claim,
+                "reference": reference,
+            }
+        )
         return result.strip().lower() == "yes"
 
 
@@ -87,16 +98,14 @@ if __name__ == "__main__":
     llm = ChatOpenAI(model="gpt-4")
     verifier = DnDScoreVerifier(llm=llm)
 
-
     # Verify a claim asynchronously
     async def main():
         is_supported = await verifier.verify_async(
             atomic_claim="The reaction rate increased",
             decontext_claim="The experiment was conducted at 300K with platinum catalyst",
-            reference="The study found that platinum catalysts increase reaction rates at 300K."
+            reference="The study found that platinum catalysts increase reaction rates at 300K.",
         )
         print(f"Is the claim supported? {is_supported}")
-
 
     # Run the async function
     asyncio.run(main())

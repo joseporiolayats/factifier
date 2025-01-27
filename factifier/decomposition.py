@@ -2,11 +2,11 @@
 # Decomposition (DR-ND Method)
 # Split sentences into atomic subclaims using Russellian/Neo-Davidsonian parsing
 
-from typing import List, Dict, Tuple
+from typing import List, Dict
 import spacy
-from langchain_core.runnables import RunnablePassthrough
 
 __all__ = ["DRNDDecomposer"]
+
 
 class DRNDDecomposer:
     def __init__(self, spacy_model: str = "en_core_web_sm"):
@@ -44,11 +44,9 @@ class DRNDDecomposer:
                     elif child.dep_ in ("dobj", "attr", "prep"):  # Object
                         obj = child.text
                 if subject or obj:  # Only include meaningful dependencies
-                    dependencies.append({
-                        "predicate": predicate,
-                        "subject": subject,
-                        "object": obj
-                    })
+                    dependencies.append(
+                        {"predicate": predicate, "subject": subject, "object": obj}
+                    )
         return dependencies
 
     def _logical_form_generation(self, dependencies: List[Dict[str, str]]) -> List[str]:
@@ -126,13 +124,11 @@ if __name__ == "__main__":
     # Initialize the decomposer
     decomposer = DRNDDecomposer()
 
-
     # Decompose a sentence asynchronously
     async def main():
         sentence = "Tarantino directed Pulp Fiction and it won an award."
         atomic_facts = await decomposer.decompose_async(sentence)
         print(atomic_facts)
-
 
     # Run the async function
     asyncio.run(main())

@@ -3,12 +3,11 @@
 # Remove redundant claims using semantic similarity
 
 from typing import List
-from langchain_core.runnables import RunnablePassthrough
 from langchain_core.embeddings import Embeddings
 from sklearn.cluster import DBSCAN
-import numpy as np
 
 __all__ = ["CoreFilter"]
+
 
 class CoreFilter:
     def __init__(self, embeddings: Embeddings, eps: float = 0.3, min_samples: int = 1):
@@ -39,7 +38,9 @@ class CoreFilter:
         # Generate embeddings for the subclaims
         embeddings = self.embeddings.embed_documents(subclaims)
         # Perform clustering using DBSCAN
-        clusters = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit_predict(embeddings)
+        clusters = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit_predict(
+            embeddings
+        )
         # Get unique cluster indices
         unique_indices = list(set(clusters))
         # Return unique subclaims based on cluster indices
@@ -58,7 +59,9 @@ class CoreFilter:
         # Generate embeddings for the subclaims asynchronously
         embeddings = await self.embeddings.aembed_documents(subclaims)
         # Perform clustering using DBSCAN
-        clusters = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit_predict(embeddings)
+        clusters = DBSCAN(eps=self.eps, min_samples=self.min_samples).fit_predict(
+            embeddings
+        )
         # Get unique cluster indices
         unique_indices = list(set(clusters))
         # Return unique subclaims based on cluster indices

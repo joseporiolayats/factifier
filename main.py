@@ -4,7 +4,12 @@
 
 from typing import Dict, List, Union
 from nltk.tokenize import sent_tokenize
-from factifier import DRNDDecomposer, MolecularFactsDecontextualizer, DnDScoreVerifier, CoreFilter
+from factifier import (
+    DRNDDecomposer,
+    MolecularFactsDecontextualizer,
+    DnDScoreVerifier,
+    CoreFilter,
+)
 
 __all__ = ["Factifier"]
 
@@ -31,7 +36,9 @@ class Factifier:
         self.verifier = verifier
         self.core_filter = core_filter
 
-    def pipeline(self, document: str, reference: str) -> Dict[str, Union[float, List[str]]]:
+    def pipeline(
+        self, document: str, reference: str
+    ) -> Dict[str, Union[float, List[str]]]:
         """
         Run the full pipeline synchronously.
 
@@ -66,7 +73,9 @@ class Factifier:
         score = sum(verified) / len(verified) if len(verified) > 0 else 0
         return {"score": score, "verified_subclaims": unique_subclaims}
 
-    async def pipeline_async(self, document: str, reference: str) -> Dict[str, Union[float, List[str]]]:
+    async def pipeline_async(
+        self, document: str, reference: str
+    ) -> Dict[str, Union[float, List[str]]]:
         """
         Run the full pipeline asynchronously.
 
@@ -78,6 +87,8 @@ class Factifier:
             Dict[str, Union[float, List[str]]]: A dictionary containing the verification score
                                                and the list of verified subclaims.
         """
+        import asyncio
+
         # Step 1: Decompose
         sentences = sent_tokenize(document)
         subclaims = [self.decomposer.decompose(sent) for sent in sentences]
@@ -85,7 +96,10 @@ class Factifier:
 
         # Step 2: Decontextualize
         decontext_subclaims = await asyncio.gather(
-            *[self.decontextualizer.decontextualize_async(c, document) for c in flat_subclaims]
+            *[
+                self.decontextualizer.decontextualize_async(c, document)
+                for c in flat_subclaims
+            ]
         )
 
         # Step 3: Verify
@@ -125,14 +139,12 @@ if __name__ == "__main__":
         core_filter=core_filter,
     )
 
-
     # Run the pipeline asynchronously
     async def main():
         document = "Tarantino directed Pulp Fiction and it won an award."
         reference = "Pulp Fiction, directed by Tarantino, won the Palme d'Or."
         result = await factifier.pipeline_async(document, reference)
         print(result)
-
 
     # Run the async function
     asyncio.run(main())

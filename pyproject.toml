@@ -15,6 +15,11 @@ spacy = "^3.8.4"
 nltk = "^3.9.1"
 
 
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.3"
+black = "^24.10.0"
+ruff = "^0.9.3"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -5,6 +5,7 @@ from langchain_core.language_models import BaseLanguageModel
 
 __all__ = ["MolecularFactsDecontextualizer"]
 
+
 class MolecularFactsDecontextualizer:
     def __init__(self, llm: BaseLanguageModel):
         """
@@ -15,18 +16,22 @@ class MolecularFactsDecontextualizer:
         """
         self.llm = llm
         # Create prompt template
-        self.decontext_prompt = ChatPromptTemplate.from_messages([
-            ("user",
-             "Resolve ambiguities in the subclaim using context from the paragraph.\n"
-             "Subclaim: {subclaim}\n"
-             "Context: {context}\n"
-             "Output the decontextualized subclaim. Do not add new information.")
-        ])
+        self.decontext_prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "user",
+                    "Resolve ambiguities in the subclaim using context from the paragraph.\n"
+                    "Subclaim: {subclaim}\n"
+                    "Context: {context}\n"
+                    "Output the decontextualized subclaim. Do not add new information.",
+                )
+            ]
+        )
         # Create the LCEL chain
         self.chain = (
             {
                 "subclaim": RunnablePassthrough(),  # Receives 'subclaim' from chain input
-                "context": RunnablePassthrough()    # Receives 'context' from chain input
+                "context": RunnablePassthrough(),  # Receives 'context' from chain input
             }
             | self.decontext_prompt
             | self.llm
@@ -70,15 +75,13 @@ if __name__ == "__main__":
     llm = ChatOpenAI(model="gpt-4")
     decontextualizer = MolecularFactsDecontextualizer(llm=llm)
 
-
     # Decontextualize a subclaim asynchronously
     async def main():
         result = await decontextualizer.decontextualize_async(
             subclaim="The reaction rate increased",
-            context="The experiment was conducted at 300K with platinum catalyst"
+            context="The experiment was conducted at 300K with platinum catalyst",
         )
         print(result)
-
 
     # Run the async function
     asyncio.run(main())

@@ -1,7 +1,16 @@
-from factifier.core import CoreFilter
-from factifier.decomposition import DRNDDecomposer
-from factifier.decontextualization import MolecularFactsDecontextualizer
-from factifier.verification import DnDScoreVerifier
-from factifier.main import Factifier
+from .core import CoreFilter as CoreFilter
+from .decomposition import DRNDDecomposer as DRNDDecomposer
+from .decontextualization import (
+    MolecularFactsDecontextualizer as MolecularFactsDecontextualizer,
+)
 
-__all___ = ["CoreFilter", "DRNDDecomposer", "MolecularFactsDecontextualizer","DnDScoreVerifier","Factifier"]
+# from .main import Factifier as Factifier
+from .verification import DnDScoreVerifier as DnDScoreVerifier
+
+__all___ = [
+    "CoreFilter",
+    "DRNDDecomposer",
+    "MolecularFactsDecontextualizer",
+    "DnDScoreVerifier",
+    # "Factifier",
+]

@@ -44,24 +44,18 @@ Coding the paper:
 ### Quick Start
 
 ```python
-from factifier import Factifier, DRNDDecomposer, MolecularFactsDecontextualizer, DnDScoreVerifier, CoreFilter
+from factifier import Factifier
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Initialize components
-decomposer = DRNDDecomposer()
 llm = ChatOpenAI(model="gpt-4")
-decontextualizer = MolecularFactsDecontextualizer(llm=llm)
-verifier = DnDScoreVerifier(llm=llm)
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-core_filter = CoreFilter(embeddings=embeddings)
 
 # Initialize Factifier
 factifier = Factifier(
-    decomposer=decomposer,
-    decontextualizer=decontextualizer,
-    verifier=verifier,
-    core_filter=core_filter,
+    llm=llm,
+   embeddings=embeddings
 )
 
 # Run the pipeline
@@ -75,6 +69,22 @@ print(result)
 
 ```python
 import asyncio
+from factifier import Factifier
+from langchain_openai import ChatOpenAI
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+# Initialize components
+llm = ChatOpenAI(model="gpt-4")
+embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+
+# Initialize Factifier
+factifier = Factifier(
+    llm=llm,
+   embeddings=embeddings
+)
+
+document = "Tarantino directed Pulp Fiction and it won an award."
+reference = "Pulp Fiction, directed by Tarantino, won the Palme d'Or."
 
 async def main():
     result = await factifier.pipeline_async(document, reference)

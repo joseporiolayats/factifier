@@ -1,3 +1,5 @@
-from .main import Factifier
+from .factifier import Factifier
+
 
 __all__ = ["Factifier"]
+

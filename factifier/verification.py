@@ -1,16 +1,23 @@
 # factifier/verification.py
 # Verification (DnDScore)
 # Verify subclaims agains reference documents using both atomic and decontextualized forms
+from typing import Any, Never
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langchain_core.language_models import BaseLanguageModel
 
 __all__ = ["DnDScoreVerifier"]
 
+class ScoreVerifier:
+    """
+    A class for verifying subclaims against reference documents using both atomic and decontextualized forms.
 
-class DnDScoreVerifier:
+    """
+
+
+class DnDScoreVerifier(ScoreVerifier):
     def __init__(self, llm: BaseLanguageModel):
         """
         Initialize the verifier with any LangChain-compatible LLM.
@@ -32,7 +39,7 @@ class DnDScoreVerifier:
             ]
         )
         # Create the LCEL chain
-        self.chain = (
+        self.chain: RunnableSerializable[Any, Any] = (
             {
                 "atomic_claim": RunnablePassthrough(),  # Receives 'atomic_claim' from chain input
                 "decontext_claim": RunnablePassthrough(),  # Receives 'decontext_claim' from chain
@@ -89,23 +96,23 @@ class DnDScoreVerifier:
         )
         return result.strip().lower() == "yes"
 
-
-if __name__ == "__main__":
-    import asyncio
-    from langchain_openai import ChatOpenAI
-
-    # Initialize with GPT-4
-    llm = ChatOpenAI(model="gpt-4")
-    verifier = DnDScoreVerifier(llm=llm)
-
-    # Verify a claim asynchronously
-    async def main():
-        is_supported = await verifier.verify_async(
-            atomic_claim="The reaction rate increased",
-            decontext_claim="The experiment was conducted at 300K with platinum catalyst",
-            reference="The study found that platinum catalysts increase reaction rates at 300K.",
-        )
-        print(f"Is the claim supported? {is_supported}")
-
-    # Run the async function
-    asyncio.run(main())
+#
+# if __name__ == "__main__":
+#     import asyncio
+#     from langchain_openai import ChatOpenAI
+#
+#     # Initialize with GPT-4
+#     llm = ChatOpenAI(model="gpt-4")
+#     verifier = DnDScoreVerifier(llm=llm)
+#
+#     # Verify a claim asynchronously
+#     async def main():
+#         is_supported = await verifier.verify_async(
+#             atomic_claim="The reaction rate increased",
+#             decontext_claim="The experiment was conducted at 300K with platinum catalyst",
+#             reference="The study found that platinum catalysts increase reaction rates at 300K.",
+#         )
+#         print(f"Is the claim supported? {is_supported}")
+#
+#     # Run the async function
+#     asyncio.run(main())

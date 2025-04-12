@@ -1,13 +1,22 @@
+from typing import Any
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.language_models import BaseLanguageModel
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
+from langchain_core.language_models import BaseLanguageModel, BaseChatModel
 
 __all__ = ["MolecularFactsDecontextualizer"]
 
 
-class MolecularFactsDecontextualizer:
-    def __init__(self, llm: BaseLanguageModel):
+class Decontextualizer:
+    """
+    A class for decontextualizing molecular facts.
+    """
+    pass
+
+
+class MolecularFactsDecontextualizer(Decontextualizer):
+    def __init__(self, llm: BaseChatModel):
         """
         Initialize the decontextualizer with any LangChain-compatible LLM.
 
@@ -28,7 +37,7 @@ class MolecularFactsDecontextualizer:
             ]
         )
         # Create the LCEL chain
-        self.chain = (
+        self.chain: RunnableSerializable[Any, str] = (
             {
                 "subclaim": RunnablePassthrough(),  # Receives 'subclaim' from chain input
                 "context": RunnablePassthrough(),  # Receives 'context' from chain input
@@ -67,21 +76,21 @@ class MolecularFactsDecontextualizer:
         return await self.chain.ainvoke({"subclaim": subclaim, "context": context})
 
 
-if __name__ == "__main__":
-    import asyncio
-    from langchain_openai import ChatOpenAI
-
-    # Initialize with GPT-4
-    llm = ChatOpenAI(model="gpt-4")
-    decontextualizer = MolecularFactsDecontextualizer(llm=llm)
-
-    # Decontextualize a subclaim asynchronously
-    async def main():
-        result = await decontextualizer.decontextualize_async(
-            subclaim="The reaction rate increased",
-            context="The experiment was conducted at 300K with platinum catalyst",
-        )
-        print(result)
-
-    # Run the async function
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     import asyncio
+#     from langchain_openai import ChatOpenAI     # type: ignore
+#
+#     # Initialize with GPT-4
+#     llm = ChatOpenAI(model="gpt-4")
+#     decontextualizer = MolecularFactsDecontextualizer(llm=llm)
+#
+#     # Decontextualize a subclaim asynchronously
+#     async def main():
+#         result = await decontextualizer.decontextualize_async(
+#             subclaim="The reaction rate increased",
+#             context="The experiment was conducted at 300K with platinum catalyst",
+#         )
+#         print(result)
+#
+#     # Run the async function
+#     asyncio.run(main())

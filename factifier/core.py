@@ -4,12 +4,18 @@
 
 from typing import List
 from langchain_core.embeddings import Embeddings
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN      # type: ignore
 
 __all__ = ["CoreFilter"]
 
+class Filter:
+    """
+    A class for filtering redundant claims using semantic similarity.
+    """
+    pass
 
-class CoreFilter:
+
+class CoreFilter(Filter):
     def __init__(self, embeddings: Embeddings, eps: float = 0.3, min_samples: int = 1):
         """
         Initialize the core filter with a LangChain-compatible embeddings model.

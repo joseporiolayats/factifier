@@ -3,13 +3,16 @@
 # Combine all processes into a simple-to-use pipeline
 
 from typing import Dict, List, Union, Type
+
+from langchain_core.embeddings import Embeddings
+from langchain_core.language_models import BaseChatModel
 from nltk.tokenize import sent_tokenize  # type: ignore
-from factifier import (
-    DRNDDecomposer,
-    MolecularFactsDecontextualizer,
-    DnDScoreVerifier,
-    CoreFilter,
-)
+
+from .decomposition import DRNDDecomposer
+from .decontextualization import MolecularFactsDecontextualizer
+from .verification import DnDScoreVerifier
+from .core import CoreFilter
+
 
 __all__ = ["Factifier"]
 
@@ -17,6 +20,8 @@ __all__ = ["Factifier"]
 class Factifier:
     def __init__(
         self,
+        llm: BaseChatModel,
+        embeddings: Embeddings,
         decomposer: Type[DRNDDecomposer] = DRNDDecomposer,
         decontextualizer: Type[MolecularFactsDecontextualizer] = MolecularFactsDecontextualizer,
         verifier: Type[DnDScoreVerifier] = DnDScoreVerifier,
@@ -26,15 +31,19 @@ class Factifier:
         Initialize the Factifier with the required components.
 
         Args:
+            llm (BaseChatModel): The language model for generating subclaims.
+            embeddings (Embeddings): The embeddings model for vectorizing subclaims.
             decomposer (DRNDDecomposer): The decomposer for splitting sentences into subclaims.
             decontextualizer (MolecularFactsDecontextualizer): The decontextualizer for resolving ambiguities.
             verifier (DnDScoreVerifier): The verifier for checking subclaims against a reference.
             core_filter (CoreFilter): The filter for removing redundant subclaims.
         """
-        self.decomposer = decomposer
-        self.decontextualizer = decontextualizer
-        self.verifier = verifier
-        self.core_filter = core_filter
+        self.llm = llm
+        self.embeddings = embeddings
+        self.decomposer = decomposer()
+        self.decontextualizer = decontextualizer(llm=self.llm)
+        self.verifier = verifier(llm=self.llm)
+        self.core_filter = core_filter(embeddings=self.embeddings)
 
     def pipeline(
         self, document: str, reference: str
@@ -124,19 +133,13 @@ class Factifier:
 #     from langchain_openai import ChatOpenAI
 # 
 #     # Initialize components (same as above)
-#     decomposer = DRNDDecomposer()
 #     llm = ChatOpenAI(model="gpt-4")
-#     decontextualizer = MolecularFactsDecontextualizer(llm=llm)
-#     verifier = DnDScoreVerifier(llm=llm)
 #     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-#     core_filter = CoreFilter(embeddings=embeddings)
-# 
+#
 #     # Initialize Factifier
 #     factifier = Factifier(
-#         decomposer=decomposer,
-#         decontextualizer=decontextualizer,
-#         verifier=verifier,
-#         core_filter=core_filter,
+#         llm=llm,
+#         embeddings=embeddings
 #     )
 # 
 #     # Run the pipeline asynchronously

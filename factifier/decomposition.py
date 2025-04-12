@@ -7,8 +7,14 @@ import spacy
 
 __all__ = ["DRNDDecomposer"]
 
+class Decomposer:
+    """
+    Decomposer class for splitting sentences into atomic subclaims
+    """
+    pass
 
-class DRNDDecomposer:
+
+class DRNDDecomposer(Decomposer):
     def __init__(self, spacy_model: str = "en_core_web_sm"):
         """
         Initialize the decomposer with a spaCy model for dependency parsing.
@@ -20,7 +26,7 @@ class DRNDDecomposer:
         # python -m spacy download en_core_web_sm
         self.nlp = spacy.load(spacy_model)
 
-    def _dependency_parsing(self, sentence: str) -> List[Dict[str, str]]:
+    def _dependency_parsing(self, sentence: str) -> List[Dict[str, str | None]]:
         """
         Perform dependency parsing on a sentence using spaCy.
 
@@ -28,28 +34,24 @@ class DRNDDecomposer:
             sentence (str): The sentence to parse.
 
         Returns:
-            List[Dict[str, str]]: A list of dependencies, where each dependency is represented
+            List[Dict[str, str | None]]: A list of dependencies, where each dependency is represented
                                   as a dictionary with keys "predicate", "subject", and "object".
         """
         doc = self.nlp(sentence)
-        dependencies = []
+        dependencies: List[Dict[str, str | None]] = []
+
         for token in doc:
             if token.dep_ in ("ROOT", "acl", "relcl"):  # Focus on predicates
                 predicate = token.text
-                subject = None
-                obj = None
-                for child in token.children:
-                    if child.dep_ in ("nsubj", "nsubjpass"):  # Subject
-                        subject = child.text
-                    elif child.dep_ in ("dobj", "attr", "prep"):  # Object
-                        obj = child.text
+                subject = next((child.text for child in token.children if child.dep_ in ("nsubj", "nsubjpass")), None)
+                obj = next((child.text for child in token.children if child.dep_ in ("dobj", "attr", "prep")), None)
+
                 if subject or obj:  # Only include meaningful dependencies
-                    dependencies.append(
-                        {"predicate": predicate, "subject": subject, "object": obj}
-                    )
+                    dependencies.append({"predicate": predicate, "subject": subject, "object": obj})
+
         return dependencies
 
-    def _logical_form_generation(self, dependencies: List[Dict[str, str]]) -> List[str]:
+    def _logical_form_generation(self, dependencies: List[Dict[str, str | None]]) -> List[str]:
         """
         Map dependencies to Neo-Davidsonian event semantics.
 
@@ -98,9 +100,7 @@ class DRNDDecomposer:
         dependencies = self._dependency_parsing(sentence)
         # Step B: Logical Form Generation
         logical_forms = self._logical_form_generation(dependencies)
-        # Step C: Atomic Fact Extraction
-        atomic_facts = self._atomic_fact_extraction(logical_forms)
-        return atomic_facts
+        return self._atomic_fact_extraction(logical_forms)
 
     async def decompose_async(self, sentence: str) -> List[str]:
         """

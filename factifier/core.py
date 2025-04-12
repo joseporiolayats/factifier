@@ -4,14 +4,16 @@
 
 from typing import List
 from langchain_core.embeddings import Embeddings
-from sklearn.cluster import DBSCAN      # type: ignore
+from sklearn.cluster import DBSCAN  # type: ignore
 
 __all__ = ["CoreFilter"]
+
 
 class Filter:
     """
     A class for filtering redundant claims using semantic similarity.
     """
+
     pass
 
 

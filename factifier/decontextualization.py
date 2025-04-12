@@ -3,7 +3,7 @@ from typing import Any
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
-from langchain_core.language_models import BaseLanguageModel, BaseChatModel
+from langchain_core.language_models import BaseChatModel
 
 __all__ = ["MolecularFactsDecontextualizer"]
 
@@ -12,6 +12,7 @@ class Decontextualizer:
     """
     A class for decontextualizing molecular facts.
     """
+
     pass
 
 

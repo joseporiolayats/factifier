@@ -1,7 +1,7 @@
 # factifier/verification.py
 # Verification (DnDScore)
 # Verify subclaims agains reference documents using both atomic and decontextualized forms
-from typing import Any, Never
+from typing import Any
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -9,6 +9,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langchain_core.language_models import BaseLanguageModel
 
 __all__ = ["DnDScoreVerifier"]
+
 
 class ScoreVerifier:
     """
@@ -95,6 +96,7 @@ class DnDScoreVerifier(ScoreVerifier):
             }
         )
         return result.strip().lower() == "yes"
+
 
 #
 # if __name__ == "__main__":

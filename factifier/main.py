@@ -23,7 +23,9 @@ class Factifier:
         llm: BaseChatModel,
         embeddings: Embeddings,
         decomposer: Type[DRNDDecomposer] = DRNDDecomposer,
-        decontextualizer: Type[MolecularFactsDecontextualizer] = MolecularFactsDecontextualizer,
+        decontextualizer: Type[
+            MolecularFactsDecontextualizer
+        ] = MolecularFactsDecontextualizer,
         verifier: Type[DnDScoreVerifier] = DnDScoreVerifier,
         core_filter: Type[CoreFilter] = CoreFilter,
     ):
@@ -131,7 +133,7 @@ class Factifier:
 #     import asyncio
 #     from langchain_community.embeddings import HuggingFaceEmbeddings
 #     from langchain_openai import ChatOpenAI
-# 
+#
 #     # Initialize components (same as above)
 #     llm = ChatOpenAI(model="gpt-4")
 #     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -141,13 +143,13 @@ class Factifier:
 #         llm=llm,
 #         embeddings=embeddings
 #     )
-# 
+#
 #     # Run the pipeline asynchronously
 #     async def main():
 #         document = "Tarantino directed Pulp Fiction and it won an award."
 #         reference = "Pulp Fiction, directed by Tarantino, won the Palme d'Or."
 #         result = await factifier.pipeline_async(document, reference)
 #         print(result)
-# 
+#
 #     # Run the async function
 #     asyncio.run(main())

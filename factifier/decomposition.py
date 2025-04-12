@@ -7,10 +7,12 @@ import spacy
 
 __all__ = ["DRNDDecomposer"]
 
+
 class Decomposer:
     """
     Decomposer class for splitting sentences into atomic subclaims
     """
+
     pass
 
 
@@ -43,15 +45,33 @@ class DRNDDecomposer(Decomposer):
         for token in doc:
             if token.dep_ in ("ROOT", "acl", "relcl"):  # Focus on predicates
                 predicate = token.text
-                subject = next((child.text for child in token.children if child.dep_ in ("nsubj", "nsubjpass")), None)
-                obj = next((child.text for child in token.children if child.dep_ in ("dobj", "attr", "prep")), None)
+                subject = next(
+                    (
+                        child.text
+                        for child in token.children
+                        if child.dep_ in ("nsubj", "nsubjpass")
+                    ),
+                    None,
+                )
+                obj = next(
+                    (
+                        child.text
+                        for child in token.children
+                        if child.dep_ in ("dobj", "attr", "prep")
+                    ),
+                    None,
+                )
 
                 if subject or obj:  # Only include meaningful dependencies
-                    dependencies.append({"predicate": predicate, "subject": subject, "object": obj})
+                    dependencies.append(
+                        {"predicate": predicate, "subject": subject, "object": obj}
+                    )
 
         return dependencies
 
-    def _logical_form_generation(self, dependencies: List[Dict[str, str | None]]) -> List[str]:
+    def _logical_form_generation(
+        self, dependencies: List[Dict[str, str | None]]
+    ) -> List[str]:
         """
         Map dependencies to Neo-Davidsonian event semantics.
 
